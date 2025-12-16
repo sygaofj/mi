@@ -10,14 +10,14 @@ export const generateCamouflage = async (ciphertext: string, topic: string): Pro
     const modelId = 'gemini-2.5-flash';
     
     const prompt = `
-      Create a realistic, professional, or creative text based on the topic: "${topic}".
+      请根据主题：“${topic}”，用中文创作一段逼真的、专业的或富有创意的文本。
       
-      At the very end of the text, append the following string exactly as it is, but label it as a "Reference ID", "Ticket Hash", "Debug Code", or "Signature" to make it look like a part of the system or document structure.
+      在文本的最后，完全保留并附加以下字符串，但将其标记为“参考 ID”、“Ticket Hash”、“调试代码”或“签名”，使其看起来像是系统或文档结构的一部分。
       
-      The string to hide is:
+      需要隐藏的字符串是：
       ${ciphertext}
       
-      Do not modify the string. Just integrate it naturally as a metadata footer.
+      请勿修改该字符串。只需将其自然地整合为元数据页脚即可。
     `;
 
     const response = await ai.models.generateContent({
@@ -25,10 +25,10 @@ export const generateCamouflage = async (ciphertext: string, topic: string): Pro
       contents: prompt,
     });
 
-    return response.text || "Failed to generate camouflage text.";
+    return response.text || "生成伪装文本失败。";
   } catch (error) {
     console.error("Gemini API Error:", error);
-    throw new Error("AI service unavailable. Please check your API key.");
+    throw new Error("AI 服务不可用。请检查您的 API 密钥。");
   }
 };
 
@@ -38,10 +38,10 @@ export const analyzePasswordStrength = async (password: string): Promise<string>
         const modelId = 'gemini-2.5-flash';
         
         const prompt = `
-          Analyze the strength of this password: "${password}".
-          Provide a very brief, 1-sentence assessment of its entropy and safety. 
-          Do not reveal the password in the response.
-          If it is weak, suggest a general improvement (e.g., "Add symbols").
+          分析此密码的强度：“${password}”。
+          用中文提供一句非常简短的评估，关于其熵值和安全性。
+          不要在回复中透露密码。
+          如果密码较弱，请给出一个通用的改进建议（例如，“添加符号”）。
         `;
     
         const response = await ai.models.generateContent({
@@ -49,8 +49,8 @@ export const analyzePasswordStrength = async (password: string): Promise<string>
           contents: prompt,
         });
     
-        return response.text || "Could not analyze password.";
+        return response.text || "无法分析密码。";
       } catch (error) {
-        return "AI analysis unavailable.";
+        return "AI 分析不可用。";
       }
 }

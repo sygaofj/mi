@@ -1,5 +1,5 @@
 {
   "name": "CipherVault AI",
-  "description": "A secure, client-side text encryption tool enhanced with Gemini AI for steganography and password generation.",
+  "description": "一个安全的客户端文本加密工具，增强了 Gemini AI 的隐写术和密码生成功能。",
   "requestFramePermissions": []
 }

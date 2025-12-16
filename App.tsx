@@ -15,7 +15,7 @@ const App: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [aiContext, setAiContext] = useState('Technical Support Email');
+  const [aiContext, setAiContext] = useState('技术支持邮件');
   const [isProcessing, setIsProcessing] = useState(false);
   const [passwordAnalysis, setPasswordAnalysis] = useState<string>('');
 
@@ -28,7 +28,7 @@ const App: React.FC = () => {
   const handleCopy = async () => {
     if (outputData) {
       await navigator.clipboard.writeText(outputData);
-      setSuccessMsg('Copied to clipboard!');
+      setSuccessMsg('已复制到剪贴板！');
       setTimeout(() => setSuccessMsg(null), 2000);
     }
   };
@@ -39,11 +39,11 @@ const App: React.FC = () => {
     setOutputData('');
 
     if (!inputData.trim()) {
-      setError('Please enter text to process.');
+      setError('请输入要处理的文本。');
       return;
     }
     if (!password) {
-      setError('Password is required for encryption/decryption.');
+      setError('加密/解密需要密码。');
       return;
     }
 
@@ -54,9 +54,9 @@ const App: React.FC = () => {
         const result: CryptoResult = encryptText(inputData, password);
         if (result.success && result.data) {
           setOutputData(result.data);
-          setSuccessMsg('Encryption successful.');
+          setSuccessMsg('加密成功。');
         } else {
-          setError(result.error || 'Encryption failed.');
+          setError(result.error || '加密失败。');
         }
       } else if (mode === AppMode.DECRYPT) {
         // Attempt to clean input if it's from a camouflage text
@@ -70,7 +70,7 @@ const App: React.FC = () => {
         const result: CryptoResult = decryptText(cleanCipher, password);
         if (result.success && result.data) {
           setOutputData(result.data);
-          setSuccessMsg('Decryption successful.');
+          setSuccessMsg('解密成功。');
         } else {
           // If direct decryption failed, try to find a token at the end of the text
           const tokens = cleanCipher.split(/\s+/);
@@ -79,19 +79,19 @@ const App: React.FC = () => {
              const retryResult = decryptText(lastToken, password);
              if (retryResult.success && retryResult.data) {
                 setOutputData(retryResult.data);
-                setSuccessMsg('Decryption successful (extracted from text).');
+                setSuccessMsg('解密成功（从文本中提取）。');
              } else {
-                setError(result.error || 'Decryption failed. Check password or ciphertext.');
+                setError(result.error || '解密失败。请检查密码或密文。');
              }
           } else {
-             setError(result.error || 'Decryption failed. Check password or ciphertext.');
+             setError(result.error || '解密失败。请检查密码或密文。');
           }
         }
       } else if (mode === AppMode.CAMOUFLAGE) {
         // 1. Encrypt first
         const cryptoRes: CryptoResult = encryptText(inputData, password);
         if (!cryptoRes.success || !cryptoRes.data) {
-            setError(cryptoRes.error || 'Encryption failed step.');
+            setError(cryptoRes.error || '加密步骤失败。');
             setIsProcessing(false);
             return;
         }
@@ -99,10 +99,10 @@ const App: React.FC = () => {
         // 2. Send to Gemini
         const camouflagedText = await generateCamouflage(cryptoRes.data, aiContext);
         setOutputData(camouflagedText);
-        setSuccessMsg('Text camouflaged successfully.');
+        setSuccessMsg('文本伪装生成成功。');
       }
     } catch (e) {
-      setError('An unexpected error occurred.');
+      setError('发生了意外错误。');
     } finally {
       setIsProcessing(false);
     }
@@ -110,7 +110,7 @@ const App: React.FC = () => {
 
   const handlePasswordAnalysis = async () => {
      if(!password) return;
-     setPasswordAnalysis('Analyzing...');
+     setPasswordAnalysis('正在分析...');
      const result = await analyzePasswordStrength(password);
      setPasswordAnalysis(result);
   };
@@ -132,32 +132,32 @@ const App: React.FC = () => {
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${mode === AppMode.ENCRYPT ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
             >
               <Lock className="w-5 h-5" />
-              <span className="font-medium">Encrypt</span>
+              <span className="font-medium">加密</span>
             </button>
             <button
               onClick={() => { setMode(AppMode.DECRYPT); setInputData(''); setOutputData(''); }}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${mode === AppMode.DECRYPT ? 'bg-emerald-600/10 text-emerald-400 border border-emerald-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
             >
               <Unlock className="w-5 h-5" />
-              <span className="font-medium">Decrypt</span>
+              <span className="font-medium">解密</span>
             </button>
             <button
               onClick={() => { setMode(AppMode.CAMOUFLAGE); setInputData(''); setOutputData(''); }}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${mode === AppMode.CAMOUFLAGE ? 'bg-violet-600/10 text-violet-400 border border-violet-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
             >
               <Sparkles className="w-5 h-5" />
-              <span className="font-medium">AI Camouflage</span>
+              <span className="font-medium">AI 伪装</span>
             </button>
           </nav>
 
           <div className="mt-8 px-4 py-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
-            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Security Status</h3>
+            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">安全状态</h3>
             <div className="flex items-center space-x-2 text-emerald-500 text-sm">
               <Shield className="w-4 h-4" />
-              <span>Client-side AES-256</span>
+              <span>客户端 AES-256</span>
             </div>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-              Your data never leaves your browser during basic encryption. AI features process encrypted hashes only.
+              在基础加密过程中，您的数据从未离开浏览器。AI 功能仅处理加密后的哈希值。
             </p>
           </div>
         </div>
@@ -171,14 +171,14 @@ const App: React.FC = () => {
               <div className="flex justify-between items-center">
                 <div>
                     <h2 className="text-2xl font-bold text-white">
-                    {mode === AppMode.ENCRYPT && 'Secure Encryption'}
-                    {mode === AppMode.DECRYPT && 'Data Restoration'}
-                    {mode === AppMode.CAMOUFLAGE && 'Steganographic Camouflage'}
+                    {mode === AppMode.ENCRYPT && '安全加密'}
+                    {mode === AppMode.DECRYPT && '数据还原'}
+                    {mode === AppMode.CAMOUFLAGE && '隐写伪装'}
                     </h2>
                     <p className="text-slate-400 text-sm mt-1">
-                    {mode === AppMode.ENCRYPT && 'Transform sensitive text into unreadable ciphertext.'}
-                    {mode === AppMode.DECRYPT && 'Recover original text from secure ciphertext.'}
-                    {mode === AppMode.CAMOUFLAGE && 'Hide encrypted data within innocent-looking AI-generated text.'}
+                    {mode === AppMode.ENCRYPT && '将敏感文本转换为不可读的密文。'}
+                    {mode === AppMode.DECRYPT && '从安全密文中恢复原始文本。'}
+                    {mode === AppMode.CAMOUFLAGE && '将加密数据隐藏在看似普通的 AI 生成文本中。'}
                     </p>
                 </div>
                 <div className="p-2 bg-slate-700/50 rounded-lg">
@@ -195,8 +195,8 @@ const App: React.FC = () => {
               {/* Input Section */}
               <div className="space-y-4">
                 <TextArea
-                  label={mode === AppMode.DECRYPT ? "Ciphertext / Camouflaged Text" : "Sensitive Text Content"}
-                  placeholder={mode === AppMode.DECRYPT ? "Paste the encrypted string here..." : "Enter the secret information you want to protect..."}
+                  label={mode === AppMode.DECRYPT ? "密文 / 伪装文本" : "敏感文本内容"}
+                  placeholder={mode === AppMode.DECRYPT ? "在此粘贴加密字符串..." : "请输入您想要保护的机密信息..."}
                   rows={5}
                   value={inputData}
                   onChange={(e) => setInputData(e.target.value)}
@@ -208,14 +208,14 @@ const App: React.FC = () => {
                     <div className="flex items-end gap-3">
                         <div className="flex-1 relative">
                             <Input
-                                label="Encryption Password"
+                                label="加密密码"
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => {
                                     setPassword(e.target.value);
                                     setPasswordAnalysis('');
                                 }}
-                                placeholder="Enter a strong password"
+                                placeholder="请输入强密码"
                                 className="pr-10"
                             />
                             <button
@@ -231,7 +231,7 @@ const App: React.FC = () => {
                                 type="button" 
                                 variant="secondary" 
                                 onClick={handlePasswordAnalysis}
-                                title="Check Strength with AI"
+                                title="AI 强度检测"
                             >
                                 <Shield size={18} />
                             </Button>
@@ -249,12 +249,12 @@ const App: React.FC = () => {
                 {mode === AppMode.CAMOUFLAGE && (
                    <div className="space-y-2">
                        <Input 
-                            label="Camouflage Context (Topic)"
-                            placeholder="e.g. Server Logs, Cooking Recipe, Meeting Notes"
+                            label="伪装场景（主题）"
+                            placeholder="例如：服务器日志、烹饪食谱、会议记录"
                             value={aiContext}
                             onChange={(e) => setAiContext(e.target.value)}
                        />
-                       <p className="text-xs text-slate-500">Gemini will generate text about this topic and hide the encrypted data inside it.</p>
+                       <p className="text-xs text-slate-500">Gemini 将生成关于此主题的文本，并将加密数据隐藏其中。</p>
                    </div>
                 )}
               </div>
@@ -286,7 +286,7 @@ const App: React.FC = () => {
                             setSuccessMsg(null);
                         }}
                      >
-                        Reset
+                        重置
                      </Button>
                      <Button 
                         onClick={processAction} 
@@ -294,9 +294,9 @@ const App: React.FC = () => {
                         variant={mode === AppMode.DECRYPT ? "primary" : "primary"}
                         className={mode === AppMode.DECRYPT ? "!bg-emerald-600 hover:!bg-emerald-500" : (mode === AppMode.CAMOUFLAGE ? "!bg-violet-600 hover:!bg-violet-500" : "")}
                      >
-                        {mode === AppMode.ENCRYPT && 'Encrypt Data'}
-                        {mode === AppMode.DECRYPT && 'Decrypt Data'}
-                        {mode === AppMode.CAMOUFLAGE && 'Generate Camouflage'}
+                        {mode === AppMode.ENCRYPT && '加密数据'}
+                        {mode === AppMode.DECRYPT && '解密数据'}
+                        {mode === AppMode.CAMOUFLAGE && '生成伪装'}
                      </Button>
                  </div>
               </div>
@@ -306,7 +306,7 @@ const App: React.FC = () => {
                 <div className="mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-sm font-medium text-slate-400">
-                        {mode === AppMode.DECRYPT ? 'Restored Original Content' : 'Resulting Output'}
+                        {mode === AppMode.DECRYPT ? '恢复的原始内容' : '生成结果'}
                     </label>
                     <div className="flex gap-2">
                         <button 
@@ -314,7 +314,7 @@ const App: React.FC = () => {
                             className="text-xs flex items-center space-x-1 text-indigo-400 hover:text-indigo-300 transition-colors"
                         >
                             <Copy className="w-3 h-3" />
-                            <span>Copy</span>
+                            <span>复制</span>
                         </button>
                     </div>
                   </div>
